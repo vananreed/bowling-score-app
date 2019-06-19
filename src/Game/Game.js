@@ -5,38 +5,73 @@ class Game extends Component {
   state = {
     total_score: 0,
     last_frame_score: 0,
-    last_throw_score: 0,
     first_throw: true,
     current_frame: 1,
     buttons: [...Array(11).keys()],
-    throws: []
+    throws: [],
+    frame_totals: []
   }
 
   toggleButtons = (score) => {
-    if (this.state.first_throw === true) {
-      this.setState({buttons: [...Array(11).keys()].slice(0, (11 - score))});
+    if (this.lastThrowWasStrike() || this.state.first_throw === false) {
+      this.setState({buttons: [...Array(11).keys()]})
     } else {
-      this.setState({buttons: [...Array(11).keys()]});
+      this.setState({buttons: [...Array(11).keys()].slice(0, (11 - score))});
     }
   }
 
   addThrowHandler = (score) => {
-    let throws = this.state.throws;
-    throws.push(score);
-
-    this.setState({
-      total_score: this.state.total_score + score,
-      last_frame_score: score,
-      current_frame: this.state.current_frame + 1,
-      first_throw: !this.state.first_throw,
-      throws: throws,
-    })
     this.updateScore(score);
     this.toggleButtons(score);
   }
 
   updateScore = (score) => {
+    var throws = this.state.throws;
+    throws.push(score);
+    if (this.lastThrowWasStrike()) {
+      console.log(this.lastFrame());
+    }
+    if (this.state.first_throw === true) {
+      if (score === 10) {
+        // Handle strike logic
+        throws.push(null);
+        this.setState({
+          total_score: this.state.total_score + score,
+          throws: throws
+        });
+      } else {
+        this.setState({
+          total_score: this.state.total_score + score,
+          first_throw: false,
+          throws: throws
+        });
+      }
+    } else {
+      let frames = this.state.frame_totals;
 
+      frames.push(score + throws[throws.length - 2]);
+      this.setState({
+        total_score: this.state.total_score + score,
+        frame_totals: frames,
+        first_throw: true,
+        current_frame: this.state.current_frame + 1,
+        throws: throws
+      })
+    }
+  }
+
+  lastThrow = (step=0) => { return this.state.throws[this.state.throws.length - 1 + step] }
+
+  lastThrowWasStrike = () => { return (this.lastThrow() === null) }
+
+  lastFrame = () => { return this.state.throws.slice(this.lastThrow(-1), this.lastThrow(1)) }
+
+  subTotal = (frame) => {
+    if (this.state.frame_totals.length > frame) {
+      return this.state.frame_totals.slice(0, frame + 1).reduce((a, b) => a + b, 0)
+    } else {
+      return null
+    }
   };
 
 
@@ -52,19 +87,18 @@ class Game extends Component {
     return (
       <div className="Game">
         <h1>Total: {this.state.total_score}</h1>
-        <h1>Last Frame: {this.state.last_frame_score}</h1>
         <h1>Current Frame: {this.state.current_frame}</h1>
         {this.state.buttons.map((num) => <button style={style} onClick={this.addThrowHandler.bind(this, num)}>{num}</button>)}
         <div>
-          <Frame number="1" firstThrow={this.state.throws[0]} secondThrow={this.state.throws[1]} frameTotal=""/>
-          <Frame number="2" firstThrow={this.state.throws[2]} secondThrow={this.state.throws[3]} frameTotal=""/>
-          <Frame number="3" firstThrow={this.state.throws[4]} secondThrow={this.state.throws[5]} frameTotal=""/>
-          <Frame number="4" firstThrow={this.state.throws[6]} secondThrow={this.state.throws[7]} frameTotal=""/>
-          <Frame number="5" firstThrow={this.state.throws[8]} secondThrow={this.state.throws[9]} frameTotal=""/>
-          <Frame number="6" firstThrow={this.state.throws[10]} secondThrow={this.state.throws[11]} frameTotal=""/>
-          <Frame number="7" firstThrow={this.state.throws[12]} secondThrow={this.state.throws[13]} frameTotal=""/>
-          <Frame number="8" firstThrow={this.state.throws[14]} secondThrow={this.state.throws[15]} frameTotal=""/>
-          <Frame number="9" firstThrow={this.state.throws[16]} secondThrow={this.state.throws[17]} frameTotal=""/>
+          <Frame number="1" firstThrow={this.state.throws[0]} secondThrow={this.state.throws[1]} frameTotal={this.subTotal(0)} />
+          <Frame number="2" firstThrow={this.state.throws[2]} secondThrow={this.state.throws[3]} frameTotal={this.subTotal(1)}/>
+          <Frame number="3" firstThrow={this.state.throws[4]} secondThrow={this.state.throws[5]} frameTotal={this.subTotal(2)}/>
+          <Frame number="4" firstThrow={this.state.throws[6]} secondThrow={this.state.throws[7]} frameTotal={this.subTotal(3)}/>
+          <Frame number="5" firstThrow={this.state.throws[8]} secondThrow={this.state.throws[9]} frameTotal={this.subTotal(4)}/>
+          <Frame number="6" firstThrow={this.state.throws[10]} secondThrow={this.state.throws[11]} frameTotal={this.subTotal(5)}/>
+          <Frame number="7" firstThrow={this.state.throws[12]} secondThrow={this.state.throws[13]} frameTotal={this.subTotal(6)}/>
+          <Frame number="8" firstThrow={this.state.throws[14]} secondThrow={this.state.throws[15]} frameTotal={this.subTotal(7)}/>
+          <Frame number="9" firstThrow={this.state.throws[16]} secondThrow={this.state.throws[17]} frameTotal={this.subTotal(8)}/>
           <Frame number="10" firstThrow={this.state.throws[18]} secondThrow={this.state.throws[19]} frameTotal={this.state.total_score}/>
         </div>
       </div>
