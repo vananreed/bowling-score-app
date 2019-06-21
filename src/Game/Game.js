@@ -21,13 +21,14 @@ class Game extends Component {
   }
 
   resetGame = () => {
-    this.setState({first_throw: true,
-    current_frame: 1,
-    buttons: [...Array(11).keys()],
-    throws: [],
-    frame_totals: [],
-    game_over: false
-  })
+    this.setState({
+      first_throw: true,
+      current_frame: 1,
+      buttons: [...Array(11).keys()],
+      throws: [],
+      frame_totals: [],
+      game_over: false
+    })
   }
 
   addThrowHandler = (score) => {
@@ -43,26 +44,20 @@ class Game extends Component {
       if (this.lastFrameWasSpare(this.lastFrame(throws))) {
         frame_totals.push(score + this.lastFrame(throws).reduce((a, b) => a + b, 0))
         this.setState({frame_totals: frame_totals})
-        this.updateScore(score, throws, frame_totals);
       } else if (this.lastFrameWasStrike(this.lastFrame(throws))) {
         if (this.pendingStrike(throws)) {
           // two strikes in a row
           frame_totals.push(score + 20);
           this.setState({ frame_totals: frame_totals})
         }
-        this.updateScore(score, throws, frame_totals);
-      } else {
-        this.updateScore(score, throws, frame_totals);
       }
     } else {
       if (this.lastFrameWasStrike(this.lastFrame(throws))) {
         frame_totals.push(10 + this.lastThrow(throws, -1) + score);
         this.setState({frame_totals: frame_totals})
-        this.updateScore(score, throws, frame_totals);
-      } else {
-        this.updateScore(score, throws, frame_totals);
       }
     }
+    this.updateScore(score, throws, frame_totals);
   }
 
   updateScore = (score, throws, frame_totals) => {
@@ -105,12 +100,13 @@ class Game extends Component {
   lastThrowWasStrike = (throws) => { return (this.lastThrow(throws) === null) }
 
   lastFrameWasStrike = (frame) => { return frame[0] === 10 && frame[1] === null }
+
   lastFrameWasSpare = (frame) => { return !this.lastFrameWasStrike(frame) && frame[0] + frame[1] === 10}
 
   lastFrame = (throws) => { return (this.state.first_throw === true) ? throws.slice(throws.length -3, throws.length -1) : throws.slice(throws.length -4, throws.length -2) }
 
   pendingStrike = (throws) => {
-    let compact = throws.filter(function (el) {return el != null}); // may not need this
+    let compact = throws.filter(function (el) {return el != null});
 
     return this.lastThrow(compact, -2) === 10
    }
@@ -124,8 +120,8 @@ class Game extends Component {
   }
 
   tenthFrameValues = () => {
-      let lastFrame = this.state.throws.slice(18)
-      return lastFrame.filter(function (el) {return el != null});
+    let lastFrame = this.state.throws.slice(18)
+    return lastFrame.filter(function (el) {return el != null});
   }
 
 
@@ -138,13 +134,14 @@ class Game extends Component {
       cursor: 'pointer',
       margin: 10,
     }
+
     return (
       <div className="Game">
         {this.state.game_over === true ? (
           <div>
             <h1>Game Over</h1>
             <button style={style} onClick={this.resetGame.bind(this)}>Reset Score</button>
-          </div>) : ""}
+          </div>) : null}
         <h1>Total: {this.subTotal(9)}</h1>
         {this.state.buttons.map((num) => <button key={num} style={style} onClick={this.addThrowHandler.bind(this, num)}>{num}</button>)}
         <div>
