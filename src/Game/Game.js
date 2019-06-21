@@ -32,11 +32,13 @@ class Game extends Component {
   }
 
   addThrowHandler = (score) => {
-    var throws = [...this.state.throws];
-    throws.push(score);
-    this.handleStrikesAndSpares(score, throws);
-    this.toggleButtons(score, throws);
-}
+    if (this.state.game_over === false) {
+      var throws = [...this.state.throws];
+      throws.push(score);
+      this.handleStrikesAndSpares(score, throws);
+      this.toggleButtons(score, throws);
+    }
+  }
 
   handleStrikesAndSpares = (score, throws) => {
     var frame_totals = [...this.state.frame_totals]
