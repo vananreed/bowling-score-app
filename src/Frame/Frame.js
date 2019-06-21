@@ -3,8 +3,8 @@ import React from 'react';
 const Frame = (props) => (
   <div className="Frame" style={styles.frame}>
     <div className="frame-header" style={styles.frameHeader}>{props.number}</div>
-    <div className="first-throw" style={styles.firstThrow}>{props.firstThrow}</div>
-    <div className="second-throw" style={styles.secondThrow}>{props.secondThrow}</div>
+    <div className="first-throw" style={styles.firstThrow}>{(props.firstThrow === 10) ? "X" : props.firstThrow}</div>
+    <div className="second-throw" style={styles.secondThrow}>{(props.firstThrow !== 10 && (props.firstThrow + props.secondThrow === 10)) ? "/" : props.secondThrow}</div>
     <div className="frame-total" style={styles.frameTotal}>{props.frameTotal}</div>
   </div>
 );
